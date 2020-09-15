@@ -1,0 +1,16 @@
+{
+  "name": "webpages_features_extractor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node -r esm main.js"
+  },
+  "keywords": [],
+  "author": "Charles Cousyn",
+  "license": "MIT",
+  "dependencies": {
+    "esm": "^3.2.25",
+    "jsdom": "^16.4.0"
+  }
+}
