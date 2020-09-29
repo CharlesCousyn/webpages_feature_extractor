@@ -3,6 +3,8 @@ import {JSDOM} from "jsdom"
 import filesSystem from "fs";
 import jsonexport from "jsonexport"
 
+import GENERAL_CONFIG from "./configFiles/generalConfig.json"
+
 //////////////////
 //Tool functions//
 //////////////////
@@ -55,22 +57,33 @@ function extractFeatures(document)
 
 (async () =>
 {
-    let path = "./html/answer_the_phone_72.html";
+    let allWebPagePaths = filesSystem.readdirSync(GENERAL_CONFIG.pathToWebPagesFolder, { encoding: 'utf8', withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .flatMap(dirent =>
+        {
+            let basePath = `${GENERAL_CONFIG.pathToWebPagesFolder}${dirent.name}/`;
+            return filesSystem.readdirSync(basePath, { encoding: 'utf8', withFileTypes: true })
+                .filter(dirent1 => dirent1.isFile())
+                .map(dirent1 => `${basePath}${dirent1.name}`)
+        });
 
-    //Get the name of the file used
-    let fileName = path.split("/").pop();
+    let promises = allWebPagePaths
+        .map(async path =>
+        {
+            //Get the name of the file used
+            let fileName = path.split("/").pop();
 
-    //Load the document
-    let doc = await pathToHTMLDocument("./html/answer_the_phone_72.html");
+            //Load the document
+            let doc = await pathToHTMLDocument(path);
 
-    //Extract features of the document
-    let feats = extractFeatures(doc);
+            //Extract features of the document
+            let feats = extractFeatures(doc);
 
-    //Create the line of data
-    let dataLine = {fileName, ...feats, class: null};
+            //Create the line of data
+            return {fileName, ...feats, class: null};
+        });
 
-    console.log(dataLine);
+    let data = await Promise.all(promises);
 
-    let pathCsv = "./answer_the_phone_72.csv"
-    await writeCSVFile([dataLine], null, pathCsv);
+    await writeCSVFile(data, null, GENERAL_CONFIG.pathToDatasetFile);
 })();
