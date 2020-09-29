@@ -1,5 +1,21 @@
 import {lexical, structural} from "./feature";
 import {JSDOM} from "jsdom"
+import filesSystem from "fs";
+import jsonexport from "jsonexport"
+
+//////////////////
+//Tool functions//
+//////////////////
+function writeJSONFile(data, replacer, path)
+{
+    filesSystem.writeFileSync(path, JSON.stringify(data, replacer, 4), "utf8");
+}
+
+async function writeCSVFile(data, replacer, path)
+{
+    const csv = await jsonexport(data, {rowDelimiter: ","});
+    filesSystem.writeFileSync(path, csv, "utf8");
+}
 
 // Path like: ./html/answer_the_phone_0.html
 async function pathToHTMLDocument(path)
@@ -17,7 +33,7 @@ async function pathToHTMLDocument(path)
 
 function extractFeatures(document)
 {
-    let features = {
+    return {
         meta_tags: lexical.meta_tags(document),
         meta_keywords: lexical.meta_keywords(document),
         max_keyword_length: lexical.max_keyword_length(document),
@@ -35,13 +51,26 @@ function extractFeatures(document)
         total_headings: structural.total_headings(document),
         link_headings: structural.link_headings(document)
     }
-
-    return features;
 }
 
 (async () =>
 {
+    let path = "./html/answer_the_phone_72.html";
+
+    //Get the name of the file used
+    let fileName = path.split("/").pop();
+
+    //Load the document
     let doc = await pathToHTMLDocument("./html/answer_the_phone_72.html");
+
+    //Extract features of the document
     let feats = extractFeatures(doc);
-    console.log(feats);
+
+    //Create the line of data
+    let dataLine = {fileName, ...feats, class: null};
+
+    console.log(dataLine);
+
+    let pathCsv = "./answer_the_phone_72.csv"
+    await writeCSVFile([dataLine], null, pathCsv);
 })();

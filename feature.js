@@ -1,8 +1,14 @@
+//////////////////
+//Tool functions//
+//////////////////
 function isNull(x)
 {
     return x === null || x === undefined;
 }
 
+/////////////////////
+//Feature functions//
+/////////////////////
 //Total number of meta tags in the page
 function meta_tags(document)
 {

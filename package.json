@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "esm": "^3.2.25",
-    "jsdom": "^16.4.0"
+    "jsdom": "^16.4.0",
+    "jsonexport": "^3.0.1"
   }
 }
